@@ -1,0 +1,24 @@
+name: FirstPlugin
+main: me.Streampy.firstplugin.Main
+version: 1.0
+commands:
+  hallo:
+    description: Hallo Speler
+  fly:
+    description: Laat jezelf vliegen!
+  msg:
+    description: stuur prive bericht
+  broadcast:
+    description: broadcast
+  bc:
+    description: broadcast gekort
+  tpa:
+    description: teleport naar andere speler
+  tpaccept:
+    description: accepteer teleport
+  tpdeny:
+    description: deny een teleport
+  tptoggle:
+    description: zet tp naar jouw uit
+  jail:
+    description: jail een speler
