@@ -22,3 +22,11 @@ commands:
     description: zet tp naar jouw uit
   jail:
     description: jail een speler
+  setspawn:
+    description: set spawn point
+  spawn: 
+    description: ga naar spawn
+  sethome:
+    description: maak voor jezelf een home
+  home:
+    description: ga naar je home

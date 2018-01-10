@@ -10,8 +10,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import me.Streampy.firstplugin.commands.broadcast;
 import me.Streampy.firstplugin.commands.fly;
 import me.Streampy.firstplugin.commands.hallo;
+import me.Streampy.firstplugin.commands.home;
 import me.Streampy.firstplugin.commands.jail;
 import me.Streampy.firstplugin.commands.msg;
+import me.Streampy.firstplugin.commands.sethome;
+import me.Streampy.firstplugin.commands.setspawn;
+import me.Streampy.firstplugin.commands.spawn;
 import me.Streampy.firstplugin.commands.tpa;
 import me.Streampy.firstplugin.commands.tpaccept;
 import me.Streampy.firstplugin.commands.tpdeny;
@@ -39,7 +43,7 @@ public class Main extends JavaPlugin {
 				config.set("join_message", "Heb veel speel plezier op onze server.");
 				config.save(configFile);
 			}catch(Exception ex) {
-				Error("Error op regel 40 van try op 35");
+				Error("Error op regel 43 van try op 37 in Class=Main");
 				ex.printStackTrace();
 			}
 		}
@@ -53,7 +57,7 @@ public class Main extends JavaPlugin {
 			config.load(configFile);
 			Strings.join_message = config.getString("join_message");
 		}catch(Exception ex) {
-			Error("Error op regel 48 van try op 45");
+			Error("Error op regel 57 van try op 48 in Class=Main");
 			ex.printStackTrace();
 		}
 		
@@ -71,19 +75,23 @@ public class Main extends JavaPlugin {
 		getCommand("tpdeny").setExecutor(new tpdeny(this));
 		getCommand("tptoggle").setExecutor(new tptoggle(this));
 		getCommand("jail").setExecutor(new jail(this));
+		getCommand("setspawn").setExecutor(new setspawn(this));
+		getCommand("spawn").setExecutor(new spawn(this));
+		getCommand("sethome").setExecutor(new sethome (this));
+		getCommand("home").setExecutor(new home (this));
 		
 		new EventsHandler(this);
 	}
 	
-	public void Debug(String message) {
+	public static void Debug(String message) {
 		Bukkit.getServer().getLogger().info("[FirstPlugin][Debug] " + message);
 	}
 	
-	public void Info(String message) {
+	public static void Info(String message) {
 		Bukkit.getServer().getLogger().info("[FirstPlugin][Info] " + message);
 	}
 	
-	public void Error(String message) {
+	public static void Error(String message) {
 		Bukkit.getServer().getLogger().info("[FirstPlugin][Error] " + message);
 	}
 
