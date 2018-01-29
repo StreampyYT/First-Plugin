@@ -1,6 +1,7 @@
 package me.Streampy.firstplugin;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -11,16 +12,21 @@ import me.Streampy.firstplugin.commands.broadcast;
 import me.Streampy.firstplugin.commands.fly;
 import me.Streampy.firstplugin.commands.hallo;
 import me.Streampy.firstplugin.commands.home;
+import me.Streampy.firstplugin.commands.info;
 import me.Streampy.firstplugin.commands.jail;
 import me.Streampy.firstplugin.commands.msg;
+import me.Streampy.firstplugin.commands.rename;
 import me.Streampy.firstplugin.commands.sethome;
+import me.Streampy.firstplugin.commands.setprefix;
 import me.Streampy.firstplugin.commands.setspawn;
+import me.Streampy.firstplugin.commands.setsuffix;
 import me.Streampy.firstplugin.commands.spawn;
 import me.Streampy.firstplugin.commands.tpa;
 import me.Streampy.firstplugin.commands.tpaccept;
 import me.Streampy.firstplugin.commands.tpdeny;
 import me.Streampy.firstplugin.commands.tptoggle;
 import me.Streampy.firstplugin.library.EventsHandler;
+import me.Streampy.firstplugin.library.Records;
 import me.Streampy.firstplugin.library.Strings;
 
 public class Main extends JavaPlugin {
@@ -29,6 +35,11 @@ public class Main extends JavaPlugin {
 	
 	File configFile = new File("plugins/firstplugin/config.yml");
 	FileConfiguration config = new YamlConfiguration();
+	
+	File userFile = new File("plugins/firstplugin/users.yml");
+	FileConfiguration user = new YamlConfiguration();
+	
+	static ArrayList<Records.userRec> usersList = Records.usersList;
 	
 	public void onEnable() {
 		
@@ -61,6 +72,8 @@ public class Main extends JavaPlugin {
 			ex.printStackTrace();
 		}
 		
+		loadusers();
+		
 		Info("FirstPlugin is aan");
 		Info("Eigenaar: Streampy");
 		Info("Veel succes!");
@@ -70,17 +83,25 @@ public class Main extends JavaPlugin {
 		getCommand("msg").setExecutor(new msg(this));
 		getCommand("broadcast").setExecutor(new broadcast(this));
 		getCommand("bc").setExecutor(new broadcast(this));
-		getCommand("tpa").setExecutor(new tpa (this));
-		getCommand("tpaccept").setExecutor(new tpaccept (this));
+		getCommand("tpa").setExecutor(new tpa(this));
+		getCommand("tpaccept").setExecutor(new tpaccept(this));
 		getCommand("tpdeny").setExecutor(new tpdeny(this));
 		getCommand("tptoggle").setExecutor(new tptoggle(this));
 		getCommand("jail").setExecutor(new jail(this));
 		getCommand("setspawn").setExecutor(new setspawn(this));
 		getCommand("spawn").setExecutor(new spawn(this));
 		getCommand("sethome").setExecutor(new sethome (this));
-		getCommand("home").setExecutor(new home (this));
-		
+		getCommand("home").setExecutor(new home(this));
+		getCommand("rename").setExecutor(new rename(this));
+		getCommand("info").setExecutor(new info(this));
+		getCommand("setprefix").setExecutor(new setprefix(this));
+		getCommand("setsuffix").setExecutor(new setsuffix(this));
+
 		new EventsHandler(this);
+	}
+	
+	public void onDisable() {
+		saveusers();
 	}
 	
 	public static void Debug(String message) {
@@ -93,6 +114,67 @@ public class Main extends JavaPlugin {
 	
 	public static void Error(String message) {
 		Bukkit.getServer().getLogger().info("[FirstPlugin][Error] " + message);
+	}
+	
+	public void loadusers() {
+		if (userFile.exists()) {
+			try {
+				user.load(userFile);
+				for (int a = 0; user.contains("user." + a); a++) {
+					Records.userRec userRecord = new Records.userRec();
+					
+					usersList.add(userRecord);
+					userRecord.uuid = user.getString("user." + a + ".id");
+					userRecord.death = user.getInt("user." + a + ".death");
+					userRecord.entitykills = user.getInt("user." + a + ".entitykills");
+					if (user.contains("user." + a + ".prefix")) {
+						userRecord.prefix = user.getString("user." + a + ".prefix");
+					}else {
+						userRecord.prefix = "<";
+					}
+					if (user.contains("user." + a + ".suffix")) {
+						userRecord.suffix = user.getString("user." + a + ".suffix");
+					}else {
+						userRecord.suffix = ">";
+					}
+				}
+				
+			}catch(Exception ex) {
+				Error("Hier ging iets fout bij het laden van de users file");
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	public void saveusers() {
+		if (!userFile.exists()) {
+			try {
+				userFile.createNewFile();
+			}catch(Exception ex) {
+				Error("Hier ging iets fout bij het maken van de users file");
+				ex.printStackTrace();
+			}
+		}
+		
+		try {
+			for (int a = 0; a < usersList.size(); a++) {
+				Records.userRec userRecord = usersList.get(a);
+				user.load(userFile);
+				int death = userRecord.death + 0;
+				int entitykills = userRecord.entitykills + 0;
+				
+				user.set("user." + a + ".id", userRecord.uuid);
+				user.set("user." + a + ".death", death);
+				user.set("user." + a + ".entitykills", entitykills);
+				user.set("user." + a + ".prefix", userRecord.prefix);
+				user.set("user." + a + ".suffix", userRecord.suffix);
+				user.save(userFile);
+			}
+		}catch(Exception ex) {
+			Error("Hier ging iets fout bij het laden van de users file");
+			ex.printStackTrace();
+		}
+		
 	}
 
 }

@@ -30,3 +30,11 @@ commands:
     description: maak voor jezelf een home
   home:
     description: ga naar je home
+  rename:
+    description: verander de naam van het item
+  info:
+    description: krijg informatie over de speler
+  setprefix:
+    description: set een prefix van een speler
+  setsuffix:
+    description: set een suffix van een speler
