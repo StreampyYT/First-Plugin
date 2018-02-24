@@ -4,18 +4,26 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
 
 import me.Streampy.firstplugin.commands.broadcast;
 import me.Streampy.firstplugin.commands.fly;
+import me.Streampy.firstplugin.commands.gm;
 import me.Streampy.firstplugin.commands.hallo;
 import me.Streampy.firstplugin.commands.home;
 import me.Streampy.firstplugin.commands.info;
 import me.Streampy.firstplugin.commands.jail;
 import me.Streampy.firstplugin.commands.msg;
 import me.Streampy.firstplugin.commands.rename;
+import me.Streampy.firstplugin.commands.sc;
 import me.Streampy.firstplugin.commands.sethome;
 import me.Streampy.firstplugin.commands.setprefix;
 import me.Streampy.firstplugin.commands.setspawn;
@@ -27,7 +35,9 @@ import me.Streampy.firstplugin.commands.tpdeny;
 import me.Streampy.firstplugin.commands.tptoggle;
 import me.Streampy.firstplugin.library.EventsHandler;
 import me.Streampy.firstplugin.library.Records;
+import me.Streampy.firstplugin.library.Records.userRec;
 import me.Streampy.firstplugin.library.Strings;
+
 
 public class Main extends JavaPlugin {
 	
@@ -96,8 +106,11 @@ public class Main extends JavaPlugin {
 		getCommand("info").setExecutor(new info(this));
 		getCommand("setprefix").setExecutor(new setprefix(this));
 		getCommand("setsuffix").setExecutor(new setsuffix(this));
+		getCommand("sc").setExecutor(new sc(this));
+		getCommand("gm").setExecutor(new gm(this));
 
 		new EventsHandler(this);
+		updateScoreboard();
 	}
 	
 	public void onDisable() {
@@ -114,6 +127,34 @@ public class Main extends JavaPlugin {
 	
 	public static void Error(String message) {
 		Bukkit.getServer().getLogger().info("[FirstPlugin][Error] " + message);
+	}
+	
+	public void updateScoreboard() {
+		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(JavaPlugin.getPlugin(Main.class), new Runnable() {
+
+			@Override
+			public void run() {
+				for (Player playerall : Bukkit.getOnlinePlayers()) {					
+					for (userRec userRecord : usersList) {
+						if (playerall.getUniqueId().toString().equals(userRecord.uuid)) {
+							if (userRecord.scoreboard == true) {
+								Scoreboard sc = Bukkit.getScoreboardManager().getNewScoreboard();
+								Objective obj = sc.registerNewObjective("scoreboard", "dummy");
+								obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+								obj.setDisplayName(ChatColor.AQUA + "Jouw Scoreboard");
+								Score EntityKills = obj.getScore(ChatColor.GOLD + "EntityKills: " + ChatColor.GREEN + userRecord.entitykills);
+								EntityKills.setScore(1);
+								Score Deaths = obj.getScore(ChatColor.GOLD + "Deaths: " + ChatColor.GREEN + userRecord.death);
+								Deaths.setScore(0);
+								playerall.setScoreboard(sc);
+								
+							}
+							break;
+						}
+					}	
+				}
+			}
+		}, 0, 20);
 	}
 	
 	public void loadusers() {
@@ -137,6 +178,7 @@ public class Main extends JavaPlugin {
 					}else {
 						userRecord.suffix = ">";
 					}
+					userRecord.scoreboard = user.getBoolean("user." + a + ".scoreboard");
 				}
 				
 			}catch(Exception ex) {
@@ -168,6 +210,7 @@ public class Main extends JavaPlugin {
 				user.set("user." + a + ".entitykills", entitykills);
 				user.set("user." + a + ".prefix", userRecord.prefix);
 				user.set("user." + a + ".suffix", userRecord.suffix);
+				user.set("user." + a + ".scoreboard", userRecord.scoreboard);
 				user.save(userFile);
 			}
 		}catch(Exception ex) {
